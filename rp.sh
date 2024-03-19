@@ -6,7 +6,7 @@ https://github.com/TreatHunter
 This is remote play script. It's purpose is to controll old pc as tvstation to be contolled over ssh
 v1.0.0
 
-The MIT License (MIT)
+MIT License
 
 Copyright (c) 2024 TreatHunter
 

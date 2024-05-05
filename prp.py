@@ -2,8 +2,8 @@
 
 """
 https://github.com/TreatHunter
-This is remote play script. Its purpose is to control old pc as tvstation over ssh
-v2.0.0
+This is remote play script. Its purpose is to control old pc as tvstation to be controlled over ssh
+v2.1.0
 
 MIT License
 
@@ -30,6 +30,7 @@ SOFTWARE.
 
 import os
 import subprocess
+import sys
 import time
 
 
@@ -50,8 +51,14 @@ def help():
     print("<>")
     print()
 
+def ap(uInput):
+    subprocess.run("xdotool getactivewindow key ctrl+w", shell=True, executable="/bin/bash")
+    subprocess.run(" nohup firefox --private-window " + uInput + "&", shell=True, executable="/bin/bash")
+    time.sleep(20)
+    subprocess.run("xdotool getactivewindow key f", shell=True, executable="/bin/bash")
 
-def ap():
+
+def apInteractiveMode():
     print("anonymous play")
     while True:
         uInput = input("enter link to open or command: ")
@@ -61,24 +68,35 @@ def ap():
             case "exit":
                 exit(0)
             case _:
-                subprocess.run("xdotool getactivewindow key ctrl+w", shell=True, executable="/bin/bash")
-                subprocess.run(" nohup firefox --private-window " + uInput + "&", shell=True, executable="/bin/bash")
-                time.sleep(20)
-                subprocess.run("xdotool getactivewindow key f", shell=True, executable="/bin/bash")
+                ap(uInput)
 
 
-os.environ["DISPLAY"] = ":0"
-print("Welcome to python remote play")
+def interactiveMode():
+    print("Welcome to python remote play")
+    while True:
+        help()
+        command = input("enter regime of work: ")
+        match command:
+            case Commands.apCommand:
+                apInteractiveMode()
+            case Commands.rtnCommand | Commands.returnCommand:
+                continue
+            case Commands.exitCommand:
+                exit(0)
+            case _:
+                print("unknown command")
 
-while True:
-    help()
-    command = input("enter regime of work: ")
-    match command:
+def executeMode():
+    match sys.argv[1]:
         case Commands.apCommand:
-            ap()
-        case Commands.rtnCommand | Commands.returnCommand:
-            continue
-        case Commands.exitCommand:
-            exit(0)
+            ap(sys.argv[2])
         case _:
             print("unknown command")
+            exit(1)
+
+os.environ["DISPLAY"] = ":0"
+if len(sys.argv) == 1:
+    interactiveMode()
+    exit(0)
+else:
+    executeMode()
